@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,4 +16,27 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+Route::post('/', function (Request $request) {
+/*  dump(request('url'));
+    dump(request()->get('url'));
+    dump(request()->input('url'));
+    dd(Request::get('url')); façades (marche pas ici :())
+    dd( $request->url); 
+*/
+
+// valider l'url
+
+//Vérifier si l'url a déja été raccourci
+$url = App\Models\Url::where('url', request('url'))->first();
+if ($url) {
+    return view('result')->with('shortened', $url->shortened);
+}
+
+//Créer une short url
+
+// Félicaitations
+
+
 });
