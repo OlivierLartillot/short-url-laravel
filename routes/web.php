@@ -34,7 +34,13 @@ Route::post('/', function (Request $request) {
 $data=['url' => request('url')];
 //Validator::make($data, $rules);
 
-Validator::make($data, ['url' => 'required|url'])->validate();
+Validator::make($data,
+                ['url' => 'required|url'],
+                /* Si on n 'utilise pas de fichier de traduction                           
+                 [
+                    'url.required' => 'Vous devez fournir une Url.',
+                    'url.url' => 'L\'adresse rentrée est invalide',
+                ] */)->validate();
 
 /* if ($validation->fails()) {
     dd('ce n est pas une url');
@@ -69,9 +75,6 @@ Helpers::createShortened();
 
     
     return view('error_create_url');
-
-
-
 // Félicaitations
 
 
