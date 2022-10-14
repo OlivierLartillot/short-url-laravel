@@ -1,7 +1,10 @@
 <?php
 
+use App\Helpers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Models\Url;
+use Illuminate\Support\Facades\Validator;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,15 +31,59 @@ Route::post('/', function (Request $request) {
 
 // valider l'url
 
-//Vérifier si l'url a déja été raccourci
-$url = App\Models\Url::where('url', request('url'))->first();
-if ($url) {
-    return view('result')->with('shortened', $url->shortened);
+$data=['url' => request('url')];
+//Validator::make($data, $rules);
+
+Validator::make($data, ['url' => 'required|url'])->validate();
+
+/* if ($validation->fails()) {
+    dd('ce n est pas une url');
 }
+else {
+    dd('SUCCESS');
+} */
+
+//Vérifier si l'url a déja été raccourci
+// url = url enregistrée en bdd
+// request('url') => l'url postée
+    $url = App\Models\Url::where('url', '=', request('url'))->first();
+    if ($url) {
+        return view('result')->with('shortened', $url->shortened);
+    }
+
+
+/*********************** */
+
+Helpers::createShortened();
 
 //Créer une short url
+//! URL create: save() + Retourne le model ...
+    $newUrl= URL::create([
+        'url' => request('url'),
+        'shortened' =>  Url::getUniqueShortUrl(),
+    ]);
+
+    if($newUrl) {
+        return view('result')->withShortened($newUrl->shortened);
+    }
+
+    
+    return view('error_create_url');
+
+
 
 // Félicaitations
 
+
+});
+
+Route::get('/{shortened}', function ($shortened){
+    $url = Url::whereShortened($shortened)->first();
+    
+    if (! $url) {
+        return redirect('/');
+    }
+
+    return redirect($url->url);
 
 });
